@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useAdmin } from "../contexts/AdminContext";
 
-const categorias = ["Resistores", "Capacitores", "Semicondutores", "Circuitos Integrados", "Conectores e Jumpers", "Ferramentas"];
+const categorias = ["Anéis", "Colares", "Brincos", "Pulseiras", "Relógios", "Conjuntos"];
 
 type UserData = {
   id: string;
@@ -19,8 +19,8 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
   const [usuarios, setUsuarios] = useState<UserData[]>([]);
 
   const [nome, setNome] = useState("");
-  const [preco, setPreco] = useState(0);
-  const [precoOriginal, setPrecoOriginal] = useState(0);
+  const [precoNormal, setPrecoNormal] = useState(0);
+  const [precoDesconto, setPrecoDesconto] = useState(0);
   const [descricao, setDescricao] = useState("");
   const [imagem, setImagem] = useState("");
   const [categoria, setCategoria] = useState(categorias[0]);
@@ -37,8 +37,8 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
     if (!p) return;
     setEditandoId(id);
     setNome(p.nome);
-    setPreco(p.preco);
-    setPrecoOriginal(p.precoOriginal || 0);
+    setPrecoNormal(p.precoOriginal || p.preco);
+    setPrecoDesconto(p.precoOriginal ? p.preco : 0);
     setDescricao(p.descricao);
     setImagem(p.imagem);
     setCategoria(p.categoria);
@@ -49,8 +49,8 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
   const abrirCriacao = () => {
     setEditandoId(null);
     setNome("");
-    setPreco(0);
-    setPrecoOriginal(0);
+    setPrecoNormal(0);
+    setPrecoDesconto(0);
     setDescricao("");
     setImagem("");
     setCategoria(categorias[0]);
@@ -68,10 +68,20 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
   };
 
   const salvar = () => {
+    const dados = {
+      nome,
+      preco: precoDesconto || precoNormal,
+      precoOriginal: precoDesconto ? precoNormal : undefined,
+      descricao,
+      imagem,
+      categoria,
+      estoque,
+    };
+
     if (modo === "editar" && editandoId) {
-      editar(editandoId, { nome, preco, precoOriginal: precoOriginal || undefined, descricao, imagem, categoria, estoque });
+      editar(editandoId, dados);
     } else if (modo === "criar") {
-      adicionar({ nome, preco, precoOriginal: precoOriginal || undefined, descricao, imagem, categoria, estoque });
+      adicionar(dados);
     }
     setModo("lista");
   };
@@ -80,25 +90,25 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-[700px] max-h-[85vh] overflow-y-auto shadow-lg">
+      <div className="bg-card border border-borda rounded-xl p-6 w-[700px] max-h-[85vh] overflow-y-auto shadow-lg">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{titulo}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:hover:text-white text-xl">✕</button>
+          <h2 className="text-xl font-bold text-primaria">{titulo}</h2>
+          <button onClick={onClose} className="text-texto-cinza hover:text-primaria text-xl">✕</button>
         </div>
 
         {modo === "lista" && (
           <>
             <div className="flex gap-2 mb-4">
-              <button onClick={abrirCriacao} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+              <button onClick={abrirCriacao} className="bg-primaria text-black px-4 py-2 rounded-lg hover:bg-primaria-hover transition-colors font-bold">
                 + Novo Produto
               </button>
-              <button onClick={() => setModo("usuarios")} className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+              <button onClick={() => setModo("usuarios")} className="bg-card-escuro text-texto px-4 py-2 rounded-lg hover:bg-card transition-colors border border-borda">
                 👥 Usuários
               </button>
             </div>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-300 dark:border-gray-600 text-gray-500">
+                <tr className="border-b border-borda text-texto-cinza">
                   <th className="text-left py-2">Produto</th>
                   <th className="text-center py-2">Preço</th>
                   <th className="text-center py-2">Estoque</th>
@@ -107,12 +117,12 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
               </thead>
               <tbody>
                 {produtos.map(produto => (
-                  <tr key={produto.id} className="border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
+                  <tr key={produto.id} className="border-b border-borda text-texto">
                     <td className="py-2">{produto.nome}</td>
-                    <td className="text-center">Kz {produto.preco.toFixed(2)}</td>
+                    <td className="text-center text-primaria">Kz {produto.preco.toFixed(2)}</td>
                     <td className={`text-center ${produto.estoque === 0 ? "text-red-500 font-bold" : ""}`}>{produto.estoque}</td>
                     <td className="text-center flex gap-2 justify-center">
-                      <button onClick={() => abrirEdicao(produto.id)} className="text-blue-500 hover:underline text-xs">Editar</button>
+                      <button onClick={() => abrirEdicao(produto.id)} className="text-primaria hover:underline text-xs">Editar</button>
                       <button onClick={() => remover(produto.id)} className="text-red-500 hover:underline text-xs">Remover</button>
                     </td>
                   </tr>
@@ -124,10 +134,10 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
 
         {modo === "usuarios" && (
           <>
-            <button onClick={() => setModo("lista")} className="mb-4 text-blue-500 hover:underline text-sm">← Voltar</button>
+            <button onClick={() => setModo("lista")} className="mb-4 text-primaria hover:underline text-sm">← Voltar</button>
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-300 dark:border-gray-600 text-gray-500">
+                <tr className="border-b border-borda text-texto-cinza">
                   <th className="text-left py-2">Nome</th>
                   <th className="text-left py-2">Email</th>
                   <th className="text-left py-2">Criado em</th>
@@ -135,7 +145,7 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
               </thead>
               <tbody>
                 {usuarios.map(u => (
-                  <tr key={u.id} className="border-b border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white">
+                  <tr key={u.id} className="border-b border-borda text-texto">
                     <td className="py-2">{u.nome}</td>
                     <td className="py-2">{u.email}</td>
                     <td className="py-2">{u.criado_em}</td>
@@ -148,39 +158,39 @@ export default function ModalAdmin({ onClose }: { onClose: () => void }) {
 
         {(modo === "editar" || modo === "criar") && (
           <form onSubmit={(e) => { e.preventDefault(); salvar(); }} className="flex flex-col gap-3">
-            <input placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} className="p-2 border rounded dark:bg-gray-700" required />
-            <textarea placeholder="Descrição" value={descricao} onChange={e => setDescricao(e.target.value)} className="p-2 border rounded dark:bg-gray-700" rows={2} required />
+            <input placeholder="Nome do produto" value={nome} onChange={e => setNome(e.target.value)} className="p-2 border border-borda rounded bg-card-escuro text-texto" required />
+            <textarea placeholder="Descrição" value={descricao} onChange={e => setDescricao(e.target.value)} className="p-2 border border-borda rounded bg-card-escuro text-texto" rows={2} required />
             <div className="flex gap-3">
               <div className="flex-1">
-                <label className="text-xs text-gray-500">Preço (Kz)</label>
-                <input type="number" value={preco} onChange={e => setPreco(Number(e.target.value))} className="w-full p-2 border rounded dark:bg-gray-700" required />
+                <label className="text-xs text-texto-cinza">Preço do Produto (Kz)</label>
+                <input type="number" placeholder="Ex: 15000" value={precoNormal} onChange={e => setPrecoNormal(Number(e.target.value))} className="w-full p-2 border border-borda rounded bg-card-escuro text-texto" required />
               </div>
               <div className="flex-1">
-                <label className="text-xs text-gray-500">Preço Original (opcional)</label>
-                <input type="number" value={precoOriginal} onChange={e => setPrecoOriginal(Number(e.target.value))} className="w-full p-2 border rounded dark:bg-gray-700" />
+                <label className="text-xs text-texto-cinza">Preço com Desconto (opcional)</label>
+                <input type="number" placeholder="Ex: 12000" value={precoDesconto || ""} onChange={e => setPrecoDesconto(Number(e.target.value))} className="w-full p-2 border border-borda rounded bg-card-escuro text-texto" />
               </div>
               <div className="flex-1">
-                <label className="text-xs text-gray-500">Estoque</label>
-                <input type="number" value={estoque} onChange={e => setEstoque(Math.max(0, Number(e.target.value)))} className="w-full p-2 border rounded dark:bg-gray-700" required />
+                <label className="text-xs text-texto-cinza">Estoque</label>
+                <input type="number" value={estoque} onChange={e => setEstoque(Math.max(0, Number(e.target.value)))} className="w-full p-2 border border-borda rounded bg-card-escuro text-texto" required />
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-500">Categoria</label>
-              <select value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full p-2 border rounded dark:bg-gray-700">
+              <label className="text-xs text-texto-cinza">Categoria</label>
+              <select value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full p-2 border border-borda rounded bg-card-escuro text-texto">
                 {categorias.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs text-gray-500">Imagem</label>
+              <label className="text-xs text-texto-cinza">Imagem</label>
               <div className="flex gap-2 items-center">
-                <input type="text" placeholder="URL ou escolha um arquivo" value={imagem} onChange={e => setImagem(e.target.value)} className="flex-1 p-2 border rounded dark:bg-gray-700" />
+                <input type="text" placeholder="URL ou escolha um arquivo" value={imagem} onChange={e => setImagem(e.target.value)} className="flex-1 p-2 border border-borda rounded bg-card-escuro text-texto" />
                 <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImagemUpload} className="hidden" />
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-gray-200 dark:bg-gray-600 px-3 py-2 rounded text-sm">📁</button>
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-card-escuro border border-borda px-3 py-2 rounded text-sm">📁</button>
               </div>
               {imagem && <img src={imagem} className="mt-2 w-20 h-20 object-cover rounded" />}
             </div>
             <div className="flex gap-2 mt-2">
-              <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Salvar</button>
+              <button type="submit" className="bg-primaria text-black px-4 py-2 rounded-lg hover:bg-primaria-hover font-bold">Salvar</button>
               <button type="button" onClick={() => setModo("lista")} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancelar</button>
             </div>
           </form>

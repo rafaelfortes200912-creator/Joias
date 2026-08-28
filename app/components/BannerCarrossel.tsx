@@ -1,41 +1,51 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Banner } from "@/src/data/banners";
 
 export default function BannerCarrossel({ banners }: { banners: Banner[] }) {
   const [atual, setAtual] = useState(0);
-  const banner = banners[atual];
 
-  const proximo = () => setAtual((atual + 1) % banners.length);
-  const anterior = () => setAtual((atual - 1 + banners.length) % banners.length);
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setAtual((prev) => (prev + 1) % banners.length);
+    }, 4000);
+    return () => clearInterval(intervalo);
+  }, [banners.length]);
 
-return (
-  <section
-    className="relative h-[400px] bg-cover bg-center rounded-b-3xl mb-8"
-    style={{ backgroundImage: `url(${banner.imagem})` }}
-  >
-    {/* Overlay escuro */}
-    <div className="absolute inset-0 bg-black/50 rounded-b-3xl" />
+  return (
+    <section className="relative h-[400px] overflow-hidden rounded-b-3xl mb-8">
+      {banners.map((banner, i) => (
+        <div
+          key={banner.id}
+          className={`absolute inset-0 transition-opacity duration-1000 ${
+            i === atual ? "opacity-100 z-10" : "opacity-0 z-0"
+          }`}
+        >
+          <img src={banner.imagem} alt={banner.titulo} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 tracking-wide">{banner.titulo}</h2>
+            <p className="text-gray-200 text-lg max-w-xl mx-auto mb-6">{banner.subtitulo}</p>
+            <Link href="#produtos" className="inline-block bg-[#D4AF37] text-black font-bold px-6 py-3 rounded-full hover:bg-[#c19a2e] transition-colors">
+              {banner.textoBotao}
+            </Link>
+          </div>
+        </div>
+      ))}
 
-    {/* Conteúdo */}
-    <div className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4">
-      <h2 className="text-4xl md:text-5xl font-bold mb-4">{banner.titulo}</h2>
-      <p className="text-gray-200 text-lg max-w-xl mx-auto mb-6">{banner.subtitulo}</p>
-      <Link href="#produtos" className="inline-block bg-white text-gray-900 font-bold px-6 py-3 rounded-full hover:bg-gray-200 transition-colors">
-        {banner.textoBotao}
-      </Link>
-    </div>
-
-    {/* Seta esquerda */}
-    <button onClick={anterior} className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition-colors">
-      ←
-    </button>
-
-    {/* Seta direita */}
-    <button onClick={proximo} className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/40 text-white rounded-full p-2 transition-colors">
-      →
-    </button>
-  </section>
-);
+      {/* Indicadores */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {banners.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setAtual(i)}
+            className={`h-1.5 rounded-full transition-all ${
+              i === atual ? "w-8 bg-[#D4AF37]" : "w-4 bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
+    </section>
+  );
 }

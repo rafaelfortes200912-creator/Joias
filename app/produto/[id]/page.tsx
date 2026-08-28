@@ -22,10 +22,10 @@ export default function ProdutoPage() {
   const [texto, setTexto] = useState("");
   const [nota, setNota] = useState(0);
   const [imagens, setImagens] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [visualizarImagens, setVisualizarImagens] = useState<string[] | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  if (!produto) return <p>Produto não encontrado</p>;
+  if (!produto) return <p className="text-texto">Produto não encontrado</p>;
 
   const estoque = produto.estoque || 0;
   const avaliacoes = getAvaliacoes(produto.id);
@@ -63,43 +63,43 @@ export default function ProdutoPage() {
   };
 
   return (
-    <div>
-      <nav className="text-sm text-gray-500 mb-6 px-4 py-2">
-        <Link href="/" className="hover:text-gray-900 dark:hover:text-gray-300">Início</Link>
+    <div className="text-texto">
+      <nav className="text-sm text-texto-cinza mb-6 px-4 py-2">
+        <Link href="/" className="hover:text-primaria">Início</Link>
         <span className="mx-2">»</span>
-        <Link href={`/categoria/${produto.categoria.toLowerCase()}`} className="hover:text-gray-900 dark:hover:text-gray-300">{produto.categoria}</Link>
+        <Link href={`/categoria/${produto.categoria.toLowerCase()}`} className="hover:text-primaria">{produto.categoria}</Link>
         <span className="mx-2">»</span>
-        <span className="text-gray-900 dark:text-white">{produto.nome}</span>
+        <span className="text-primaria">{produto.nome}</span>
       </nav>
 
       <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0">
-          <img src={produto.imagem} alt={produto.nome} className="w-80 h-80 object-cover rounded-xl" />
+          <img src={produto.imagem} alt={produto.nome} className="w-80 h-80 object-cover rounded-xl border border-borda" />
         </div>
 
         <div className="flex flex-col">
-          <h1 className="text-2xl font-bold">{produto.nome}</h1>
-          <p className="text-gray-600 mt-2">{produto.descricao}</p>
+          <h1 className="text-2xl font-bold text-primaria">{produto.nome}</h1>
+          <p className="text-texto-cinza mt-2">{produto.descricao}</p>
           {produto.precoOriginal && (
-            <p className="text-gray-400 line-through mt-4">Kz {produto.precoOriginal.toFixed(2)}</p>
+            <p className="text-texto-cinza line-through mt-4">Kz {produto.precoOriginal.toFixed(2)}</p>
           )}
-          <p className="text-green-600 font-bold text-2xl">Kz {produto.preco.toFixed(2)}</p>
-          <p className="text-sm text-gray-500 mt-1">{estoque} unidades disponíveis</p>
+          <p className="text-primaria font-bold text-2xl">Kz {produto.preco.toFixed(2)}</p>
+          <p className="text-sm text-texto-cinza mt-1">{estoque} unidades disponíveis</p>
 
           <div className="flex items-center gap-3 mt-6">
-            <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
+            <div className="flex items-center border border-borda rounded-lg">
               <button onClick={() => setQuantidade(q => Math.max(1, q - 1))}
-                className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">−</button>
+                className="px-3 py-2 hover:bg-card-escuro transition-colors text-primaria">−</button>
               <input type="number" value={quantidade}
                 onChange={(e) => setQuantidade(Math.min(estoque, Math.max(1, Number(e.target.value))))}
-                className="w-14 text-center py-2 bg-transparent text-gray-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                className="w-14 text-center py-2 bg-transparent text-texto outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
               <button onClick={() => setQuantidade(q => Math.min(estoque, q + 1))}
-                className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">+</button>
+                className="px-3 py-2 hover:bg-card-escuro transition-colors text-primaria">+</button>
             </div>
             {estoque > 0 ? (
               <button onClick={handleAdicionar}
-                className={`px-6 py-3 rounded-lg font-bold text-white transition-colors ${
-                  noCarrinho ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
+                className={`px-6 py-3 rounded-lg font-bold transition-colors ${
+                  noCarrinho ? "bg-primaria-hover text-black" : "bg-primaria text-black hover:bg-primaria-hover"
                 }`}>
                 {noCarrinho ? "✓ Adicionado" : "Adicionar ao Carrinho"}
               </button>
@@ -110,24 +110,24 @@ export default function ProdutoPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8 border-t border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-bold mb-4">Avaliações</h2>
+      <div className="max-w-4xl mx-auto px-4 py-8 border-t border-borda">
+        <h2 className="text-xl font-bold mb-4 text-primaria">Avaliações</h2>
 
         <div className="flex items-center gap-2 mb-4">
-          <div className="text-yellow-400 text-2xl">
+          <div className="text-primaria text-2xl">
             {[1, 2, 3, 4, 5].map((e) => (<span key={e}>{e <= Math.round(media) ? "⭐" : "☆"}</span>))}
           </div>
-          <span className="text-gray-500">({avaliacoes.comentarios.length} comentários)</span>
+          <span className="text-texto-cinza">({avaliacoes.comentarios.length} comentários)</span>
         </div>
 
         {!mostrarForm && usuario && (
           <button onClick={() => setMostrarForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors mb-4">
+            className="bg-primaria text-black px-4 py-2 rounded-lg hover:bg-primaria-hover transition-colors mb-4 font-bold">
             {jaAvaliou ? "Comentar" : "Avaliar Produto"}
           </button>
         )}
         {!mostrarForm && !usuario && (
-          <p className="text-gray-500 text-sm mb-4">🔒 Faça login para deixar uma avaliação.</p>
+          <p className="text-texto-cinza text-sm mb-4">🔒 Faça login para deixar uma avaliação.</p>
         )}
 
         {mostrarForm && (
@@ -138,10 +138,10 @@ export default function ProdutoPage() {
             setTexto("");
             setNota(0);
             setImagens([]);
-          }} className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mb-6">
-            <p className="text-sm text-gray-500 mb-2">Comentando como <strong>{usuario?.nome}</strong></p>
+          }} className="bg-card-escuro p-4 rounded-lg mb-6 border border-borda">
+            <p className="text-sm text-texto-cinza mb-2">Comentando como <strong className="text-primaria">{usuario?.nome}</strong></p>
             <textarea placeholder="Seu comentário" value={texto} onChange={(e) => setTexto(e.target.value)}
-              className="w-full p-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 mb-2" rows={3} required />
+              className="w-full p-2 rounded border border-borda bg-card text-texto mb-2" rows={3} required />
 
             {!jaAvaliou && (
               <div className="flex gap-1 mb-2 text-2xl">
@@ -156,7 +156,7 @@ export default function ProdutoPage() {
             <div className="mb-2">
               <input type="file" accept="image/*" multiple ref={fileInputRef} onChange={handleImagensUpload} className="hidden" />
               <button type="button" onClick={() => fileInputRef.current?.click()}
-                className="text-sm text-blue-500 hover:underline">📷 Adicionar fotos</button>
+                className="text-sm text-primaria hover:underline">📷 Adicionar fotos</button>
               {imagens.length > 0 && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {imagens.map((img, i) => (
@@ -171,7 +171,7 @@ export default function ProdutoPage() {
             </div>
 
             <div className="flex gap-2">
-              <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Enviar</button>
+              <button type="submit" className="bg-primaria text-black px-4 py-2 rounded-lg hover:bg-primaria-hover font-bold">Enviar</button>
               <button type="button" onClick={() => { setMostrarForm(false); setImagens([]); }}
                 className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Cancelar</button>
             </div>
@@ -179,21 +179,21 @@ export default function ProdutoPage() {
         )}
 
         {avaliacoes.comentarios.length === 0 ? (
-          <p className="text-gray-500">Nenhum comentário ainda.</p>
+          <p className="text-texto-cinza">Nenhum comentário ainda.</p>
         ) : (
           <div className="space-y-3">
             {avaliacoes.comentarios.map((c) => (
-              <div key={c.id} className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+              <div key={c.id} className="bg-card-escuro p-3 rounded-lg border border-borda">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold">{c.nome}</span>
-                  {c.nota > 0 && <span className="text-yellow-400 text-sm">{"⭐".repeat(c.nota)}</span>}
-                  <span className="text-gray-400 text-xs">{c.data}</span>
+                  <span className="font-bold text-primaria">{c.nome}</span>
+                  {c.nota > 0 && <span className="text-primaria text-sm">{"⭐".repeat(c.nota)}</span>}
+                  <span className="text-texto-cinza text-xs">{c.data}</span>
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">{c.texto}</p>
+                <p className="text-texto mt-1">{c.texto}</p>
                 {c.imagens && c.imagens.length > 0 && (
                   <div className="flex gap-2 mt-2 flex-wrap">
                     {c.imagens.map((img, i) => (
-                      <img key={i} src={img} className="w-20 h-20 object-cover rounded cursor-pointer"
+                      <img key={i} src={img} className="w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80"
                         onClick={() => setVisualizarImagens(c.imagens)} />
                     ))}
                   </div>
@@ -203,6 +203,7 @@ export default function ProdutoPage() {
           </div>
         )}
       </div>
+      {visualizarImagens && <VisualizadorImagens imagens={visualizarImagens} onClose={() => setVisualizarImagens(null)} />}
     </div>
   );
 }

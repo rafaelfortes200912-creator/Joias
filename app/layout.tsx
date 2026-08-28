@@ -20,14 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MagicX",
-  description: "Componentes eletrônicos para os teus projetos",
-    icons: {
-    icon: [
-      { url: "/MagicX_logo.png", type: "image/png" },
-      { url: "/favicon.ico" },
-    ],
-  },
+  title: "Glamour",
+  description: "Joias finas e semijoias para todos os momentos",
 };
 
 export default function RootLayout({
@@ -36,22 +30,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="pt-pt"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="pt-pt" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-fundo text-texto">
         <AuthProvider>
         <AdminProvider>
         <CarrinhoProvider>
         <HistoricoProvider>
         <AvaliacaoProvider>
-        <ParticulasFundo />
         <Header />
         {children}
-        <footer className="bg-gray-900 text-gray-400 py-8 mt-auto">
+        <footer className="bg-card text-texto-cinza py-8 mt-auto border-t border-borda">
           <div className="max-w-6xl mx-auto px-4 text-center text-sm">
-            <p>© 2026 MagicX. Todos os direitos reservados.</p>
+            <p className="text-primaria font-bold tracking-widest uppercase">Glamour</p>
+            <p className="mt-2">© 2026 Glamour. Todos os direitos reservados.</p>
           </div>
         </footer>
         </AvaliacaoProvider>
